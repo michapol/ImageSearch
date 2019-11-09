@@ -12,22 +12,70 @@ import XCTest
 class ImageSearchTests: XCTestCase {
 
     override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        
     }
-
+    
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        
     }
-
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    
+    func testNoCache() {
+        let searchCache = SearchCache()
+        XCTAssertNil(searchCache.getCache(searchText: "test", searchCategories: "photo"))
     }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
+    
+    func testSaveAndGetFromCache() {
+        let searchItem = SearchItem()
+        searchItem.searchString = "test"
+        searchItem.searchCategories = "photo"
+        
+        let searchCache = SearchCache()
+        searchCache.items.append(searchItem)
+        
+        XCTAssertNil(searchCache.getCache(searchText: "notTest", searchCategories: "photo"))
+        XCTAssertNotNil(searchCache.getCache(searchText: "test", searchCategories: "photo"))
+        XCTAssertEqual(searchCache.getCache(searchText: "test", searchCategories: "photo"), searchItem)
+        
+        searchItem.searchString = "test1"
+        XCTAssertNotEqual(searchCache.getCache(searchText: "test", searchCategories: "photo"), searchItem)
+    }
+    
+    func testClearCache() {
+        let searchItem = SearchItem()
+        searchItem.searchString = "test"
+        searchItem.searchCategories = "photo"
+        
+        let searchCache = SearchCache()
+        searchCache.items.append(searchItem)
+        
+        searchCache.clearAllCache()
+        
+        XCTAssertNil(searchCache.getCache(searchText: "test", searchCategories: "photo"))
+    }
+    
+    func testImageNoCache() {
+        let searchItem = SearchItem()
+        XCTAssertFalse(searchItem.getImage(imageURL: "https://cdn.pixabay.com/photo/2018/01/05/16/24/rose-3063284_150.jpg") { (image) in
+            XCTAssertNotNil(image)
+        })
+    }
+    
+    func testImageCache() {
+        let searchItem = SearchItem()
+        _ = searchItem.getImage(imageURL: "https://cdn.pixabay.com/photo/2018/01/05/16/24/rose-3063284_150.jpg") { (image) in
+            XCTAssertNotNil(image)
+            XCTAssertTrue(searchItem.getImage(imageURL: "https://cdn.pixabay.com/photo/2018/01/05/16/24/rose-3063284_150.jpg") { (image) in
+                XCTAssertNotNil(image)
+            })
+        }
+    }
+    
+    func testSearchSpeed() {
+        let searchController = SearchController()
         self.measure {
-            // Put the code you want to measure the time of here.
+            searchController.search(searchText: "dog", searchCategories: "all", completion: { (searchItem) in
+                XCTAssertNotNil(searchItem?.searchResult)
+            })
         }
     }
 

@@ -1,8 +1,8 @@
 //
 //  AppDelegate.swift
-//  ImageSearch
+//  Candyspace
 //
-//  Created by Mike Pollard on 09/11/2019.
+//  Created by Mike Pollard on 11/10/2019.
 //  Copyright © 2019 Mike Pollard. All rights reserved.
 //
 
